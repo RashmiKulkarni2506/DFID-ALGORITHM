@@ -1,102 +1,61 @@
-# Graph Building
+from collections import defaultdict
 
-VertexList = [str(i) for i in range(0, 7)]
+class Graph:
 
-EdgeList = [(0, 1), (0, 2), (1, 0), (1, 3), (2, 0), (2, 4), (2, 5), (3, 1), (4, 2), (5, 2), (6, 4),
-            (4, 6)]  # undirected Graph
+	def __init__(self,vertices):
 
-AdjList = [[] for vertex in VertexList]  # empty initialy
+		# No. of vertices
+		self.V = vertices
 
-for edge in EdgeList:
-    AdjList[edge[0]].append(edge[1])  # List of Adjacent Vertices
+		# default dictionary to store graph
+		self.graph = defaultdict(list)
 
+	# function to add an edge to graph
+	def addEdge(self,u,v):
+		self.graph[u].append(v)
 
+	# A function to perform a Depth-Limited search
+	# from given source 'src'
+	def DLS(self,src,target,maxDepth):
 
-# DFS for a graph
+		if src == target : return True
 
-def DFS():
-    Target = int(input("Enter Target Vertex>>>   "))
-    Stack = []
-    Stack.append(0)
-    visitedList = []
-    DFSstep = 0
-    while Stack:
-        current = Stack.pop()
+		# If reached the maximum depth, stop recursing.
+		if maxDepth <= 0 : return False
 
-        for neighbour in AdjList[current]:
-            DFSstep += 1
-            if not neighbour in visitedList:
-                Stack.append(neighbour)
+		# Recur for all the vertices adjacent to this vertex
+		for i in self.graph[src]:
+				if(self.DLS(i,target,maxDepth-1)):
+					return True
+		return False
 
-        visitedList.append(current)
-        if current == Target:
-            break
-    print("Output of Deapth First Search >>>>> ", visitedList)
-    print("Comparative Factor >>>>>{}".format(DFSstep))
+	# IDDFS to search if target is reachable from v.
+	# It uses recursive DLS()
+	def IDDFS(self,src, target, maxDepth):
 
+		# Repeatedly depth-limit search till the
+		# maximum depth
+		for i in range(maxDepth):
+			if (self.DLS(src, target, i)):
+				return True
+		return False
 
-DFS()
+# Create a graph given in the above diagram
+g = Graph (7);
+g.addEdge(0, 1)
+g.addEdge(0, 2)
+g.addEdge(1, 3)
+g.addEdge(1, 4)
+g.addEdge(2, 5)
+g.addEdge(2, 6)
 
+target = 6; maxDepth = 3; src = 0
 
-
-
-def BFS():
-    Target = int(input("Enter Target Vertex>>>   "))
-    Queue = []
-    Queue.append(0)
-    visitedList = []
-    BFSstep = 0
-    while Queue:
-        current = Queue.pop()
-        for neighbour in AdjList[current]:
-            BFSstep += 1
-            if not neighbour in visitedList:
-                Queue.insert(0, neighbour)
-
-        visitedList.append(current)
-
-        if current == Target:
-            break
-    print("Output of Breadth First Search >>>>", visitedList)
-    print("Comparative Factor >>>>>{}".format(BFSstep))
+if g.IDDFS(src, target, maxDepth) == True:
+	print ("Target is reachable from source " +
+		"within max depth")
+else :
+	print ("Target is NOT reachable from source " +
+		"within max depth")
 
 
-BFS()
-
-
-# IDDFS => DFID
-IDDFSStep = 0
-
-
-def IDDFS(currentVertex, DestVertex, limit):  # Its depth limited search
-    # print("Checkiing for Destination",currentVertex)
-    if currentVertex == DestVertex:
-        return True
-    if limit <= 0:
-        return False
-
-    for Vertex in AdjList[currentVertex]:
-        print(currentVertex, AdjList[currentVertex])
-        if IDDFS(Vertex, DestVertex, limit - 1):
-            return True
-
-    return False
-
-
-def mainIDDFS(currentVertex, DestVertex, maxDepth):  # its IDDFS search
-    IDDFSStep = 0  # Comparison parameter
-    for limit in range(maxDepth):
-        IDDFSStep += 1
-        if IDDFS(currentVertex, DestVertex, limit):
-            print("Comparative Factor >>>>>{}".format(IDDFSStep))
-            return True
-    return False
-
-
-if not mainIDDFS(0, 6, 4):
-
-    print("Path is not Available within specified Depth!!!")
-
-else:
-
-    print("Path is Available!!!")
